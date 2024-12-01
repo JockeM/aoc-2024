@@ -6,8 +6,7 @@ use std::process::Output;
 use std::time::{Duration, Instant};
 use std::{cmp, env, process};
 
-use crate::template::ANSI_BOLD;
-use crate::template::{aoc_cli, Day, ANSI_ITALIC, ANSI_RESET};
+use crate::template::{aoc_cli, Day};
 
 pub fn run_part<I: Clone, T: Display>(func: impl Fn(I) -> Option<T>, input: I, day: Day, part: u8) {
     let part_str = format!("Part {part}");
@@ -55,7 +54,7 @@ fn run_timed<I: Clone, T>(
 fn bench<I: Clone, T>(func: impl Fn(I) -> T, input: I, base_time: &Duration) -> (Duration, u128) {
     let mut stdout = stdout();
 
-    print!(" > {ANSI_ITALIC}benching{ANSI_RESET}");
+    print!(" > benching");
     let _ = stdout.flush();
 
     let bench_iterations =
@@ -109,7 +108,7 @@ fn print_result<T: Display>(result: &Option<T>, part: &str, duration_str: &str) 
                     println!("{result}");
                 }
             } else {
-                let str = format!("{part}: {ANSI_BOLD}{result}{ANSI_RESET}{duration_str}");
+                let str = format!("{part}: {result}{duration_str}");
                 if is_intermediate_result {
                     print!("{str}");
                 } else {

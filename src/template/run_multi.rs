@@ -1,6 +1,6 @@
 use std::{collections::HashSet, io};
 
-use crate::template::{Day, ANSI_BOLD, ANSI_ITALIC, ANSI_RESET};
+use crate::template::{Day};
 
 use super::{
     all_days,
@@ -21,7 +21,7 @@ pub fn run_multi(days_to_run: &HashSet<Day>, is_release: bool, is_timed: bool) -
             }
             need_space = true;
 
-            println!("{ANSI_BOLD}Day {day}{ANSI_RESET}");
+            println!("Day {day}");
             println!("------");
 
             let output = child_commands::run_solution(day, is_timed, is_release).unwrap();
@@ -38,7 +38,7 @@ pub fn run_multi(days_to_run: &HashSet<Day>, is_release: bool, is_timed: bool) -
         let timings = Timings { data: timings };
         let total_millis = timings.total_millis();
         println!(
-            "\n{ANSI_BOLD}Total (Run):{ANSI_RESET} {ANSI_ITALIC}{total_millis:.2}ms{ANSI_RESET}"
+            "\nTotal (Run): {total_millis:.2}ms"
         );
         Some(timings)
     } else {
