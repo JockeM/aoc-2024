@@ -2,32 +2,25 @@ advent_of_code::solution!(3);
 
 const MAX_LENGTH: usize = "mul(333,333)".len();
 
-fn is_mul(str: &str) -> Option<(u32, u32)> {
-    if !str.starts_with("mul(") {
+fn is_mul(input: &str) -> Option<(u32, u32)> {
+    if !input.starts_with("mul(") {
         return None;
     }
 
-    for (i, c) in str[4..4 + 4].char_indices() {
-        if c.is_alphanumeric() {
-            continue;
-        }
-        if c == ',' {
-            for (ii, c) in str[5 + i..5 + i + 4].char_indices() {
-                if c.is_alphanumeric() {
-                    continue;
-                }
-                if c == ')' {
-                    let a = str[4..4 + i].parse().expect("1 Not a number");
-                    let b = str[5 + i..5 + i + ii].parse().expect("2 Not a number");
-                    return Some((a, b));
-                }
-                return None;
-            }
-        }
+    let after_prefix = &input[4..];
+    let comma_pos = after_prefix.find(',')?;
+    let closing_paren_pos = after_prefix.find(')')?;
+
+    if comma_pos >= closing_paren_pos {
         return None;
     }
 
-    None
+    let a = after_prefix[..comma_pos].parse().ok()?;
+    let b = after_prefix[comma_pos + 1..closing_paren_pos]
+        .parse()
+        .ok()?;
+
+    Some((a, b))
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
