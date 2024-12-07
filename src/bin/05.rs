@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
 
@@ -43,61 +43,41 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let rules = input
+    let rules: HashMap<u32, Vec<u32>> = input
         .lines()
         .map_while(|line| line.split_once('|'))
-        .map(|(left, right)| {
-            let left = left.parse::<u32>().unwrap();
-            let right = right.parse::<u32>().unwrap();
-            (right, left)
-        })
+        .map(|(left, right)| (right.parse().expect("Invalid right value"), left.parse().expect("Invalid left value")))
         .into_group_map();
 
-    let split_index = input.find("\n\n").unwrap();
-    let remaining_input = &input[split_index + 2..];
+    let remaining_input = input.split("\n\n").nth(1)?;
 
     Some(
         remaining_input
             .lines()
             .map(|line| {
                 line.split(',')
-                    .map(|c| c.parse::<u32>().unwrap())
+                    .map(|c| c.parse::<u32>().expect("Invalid number"))
                     .collect_vec()
             })
-            .filter_map(|row| {
-                let mut banned = HashSet::<u32>::new();
+            .filter_map(|mut row| {
                 let mut wrong = false;
-
-                for &c in &row {
-                    if banned.contains(&c) {
-                        wrong = true;
-                    }
-                    if let Some(new_banned) = rules.get(&c) {
-                        banned.extend(new_banned);
-                    }
-                }
-
-                let mut sorted_row = row.clone();
                 let mut i = 0;
-                while i < sorted_row.len() {
-                    let c = sorted_row[i];
-                    if let Some(precedence) = rules.get(&c) {
-                        if let Some(last_pos) =
-                            sorted_row.iter().rposition(|x| precedence.contains(x))
-                        {
+                while i < row.len() {
+                    if let Some(precedence) = rules.get(&row[i]) {
+                        if let Some(last_pos) = row.iter().rposition(|x| precedence.contains(x)) {
                             if last_pos > i {
-                                sorted_row.swap(last_pos, i);
+                                row.swap(last_pos, i);
                                 if i > 0 {
                                     i -= 1;
                                 }
+                                wrong = true;
                                 continue;
                             }
                         }
                     }
                     i += 1;
                 }
-
-                wrong.then(|| sorted_row[sorted_row.len() / 2])
+                wrong.then(|| row[row.len() / 2])
             })
             .sum(),
     )
