@@ -4,59 +4,63 @@ use itertools::Itertools;
 
 advent_of_code::solution!(11);
 
-fn solve(stone: u64, blink: usize, cache: &mut HashMap<(u64, usize), u64>) -> u64 {
+fn solve(stone: u64, blink: usize, cache: &mut HashMap<u64, u64>) -> u64 {
     if blink == 0 {
         return 1;
     }
 
-    if let Some(&result) = cache.get(&(stone, blink)) {
+    let key = (stone << 7) | (blink as u64);
+
+    if let Some(&result) = cache.get(&key) {
         return result;
     }
 
-    let result = match stone {
-        0 => solve(1, blink - 1, cache),
-        s if s.to_string().len() % 2 == 0 => {
-            let stone_str = s.to_string();
+    let result = if stone == 0 {
+        solve(1, blink - 1, cache)
+    } else {
+        let stone_str = stone.to_string();
+        if stone_str.len() % 2 == 0 {
             let (left, right) = stone_str.split_at(stone_str.len() / 2);
 
             solve(left.parse().unwrap(), blink - 1, cache)
                 + solve(right.parse().unwrap(), blink - 1, cache)
+        } else {
+            solve(stone * 2024, blink - 1, cache)
         }
-        s => solve(s * 2024, blink - 1, cache),
     };
 
-    cache.insert((stone, blink), result);
+    cache.insert(key, result);
     result
 }
 
 pub fn part_one(input: &str) -> Option<u64> {
     let stones = input
         .split_whitespace()
-        .map(|stone| stone.parse::<u64>().unwrap())
+        .map(|stone| stone.parse().unwrap())
         .collect_vec();
 
-    let mut cache = HashMap::<(u64, usize), u64>::new();
-    let mut sum = 0;
-    for stone in stones {
-        sum += solve(stone, 25, &mut cache);
-    }
-
-    Some(sum)
+    let mut cache = HashMap::new();
+    Some(
+        stones
+            .iter()
+            .map(|&stone| solve(stone, 25, &mut cache))
+            .sum(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
     let stones = input
         .split_whitespace()
-        .map(|stone| stone.parse::<u64>().unwrap())
+        .map(|stone| stone.parse().unwrap())
         .collect_vec();
 
-    let mut cache = HashMap::<(u64, usize), u64>::new();
-    let mut sum = 0;
-    for stone in stones {
-        sum += solve(stone, 75, &mut cache);
-    }
-
-    Some(sum)
+    let mut cache = HashMap::new();
+    Some(
+        stones
+            .iter()
+            .map(|&stone| solve(stone, 75, &mut cache))
+            .sum(),
+    )
 }
 
 #[cfg(test)]
