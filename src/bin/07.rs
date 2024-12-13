@@ -46,9 +46,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(
         data.iter()
             .filter(|(sum, values)| {
-                generate_combinations(values.len() - 1, 2)
-                    .find(|ops| can_sum(values, &ops, *sum))
-                    .is_some()
+                generate_combinations(values.len() - 1, 2).any(|ops| can_sum(values, &ops, *sum))
             })
             .map(|(sum, _)| sum)
             .sum::<u64>(),
@@ -71,9 +69,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     Some(
         data.iter()
             .filter(|(sum, values)| {
-                generate_combinations(values.len() - 1, 3)
-                    .find(|ops| can_sum(values, &ops, *sum))
-                    .is_some()
+                generate_combinations(values.len() - 1, 3).any(|ops| can_sum(values, &ops, *sum))
             })
             .map(|(sum, _)| sum)
             .sum::<u64>(),
