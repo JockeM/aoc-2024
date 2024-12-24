@@ -20,45 +20,23 @@ pub fn part_one(input: &str) -> Option<u64> {
             .split("\n\n")
             .map(|group| {
                 let mut it = group.lines();
-                let a = parse_button(it.next().unwrap());
-                let b = parse_button(it.next().unwrap());
-                let target = parse_target(it.next().unwrap());
-
-                (a, b, target)
+                (
+                    parse_button(it.next().unwrap()),
+                    parse_button(it.next().unwrap()),
+                    parse_target(it.next().unwrap()),
+                )
             })
-            .filter_map(|(a, b, target)| {
-                let (ax, ay) = a;
-                let (bx, by) = b;
-                let (tx, ty) = target;
-
-                let max_na = tx / ax;
-                for na in 0..=max_na {
-                    let (px, py) = (ax * na, ay * na);
-                    if px > tx || py > ty {
-                        return None;
-                    }
-
-                    let (dx, dy) = (tx - px, ty - py);
-
-                    if dx % bx == 0 && dy % by == 0 {
-                        if dx / bx == dy / by {
-                            let nb = dx / bx;
-                            return Some(na * 3 + nb);
-                        }
-                    }
-                }
-
-                None
-            })
+            .filter_map(|(a, b, target)| binary_search(a, b, target))
+            .map(|(a, b)| a * 3 + b)
             .sum::<u64>(),
     )
 }
 
-fn binary_search(a: (u64, u64), b: (u64, u64), t: (u64, u64)) -> Option<(u64, u64)> {
-    let (ax, ay) = a;
-    let (bx, by) = b;
-    let (tx, ty) = t;
-
+fn binary_search(
+    (ax, ay): (u64, u64),
+    (bx, by): (u64, u64),
+    (tx, ty): (u64, u64),
+) -> Option<(u64, u64)> {
     let a_bigger_than_b = (ty * ax) > (tx * ay);
 
     let (mut low, mut high) = (0, u64::min(tx / ax, ty / ay));
@@ -117,7 +95,6 @@ pub fn part_two(input: &str) -> Option<u128> {
                 let a = parse_button(it.next().unwrap());
                 let b = parse_button(it.next().unwrap());
                 let target = parse_target(it.next().unwrap());
-
                 (a, b, (target.0 + 10000000000000, target.1 + 10000000000000))
             })
             .filter_map(|(a, b, target)| binary_search(a, b, target))
